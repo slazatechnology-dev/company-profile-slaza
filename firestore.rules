@@ -1,0 +1,21 @@
+rules_version = '2';
+
+// Hanya pemilik PT yang boleh membaca dan menulis. Semua path lain ditolak.
+// UID pemilik (akun Google yang dipakai login ke portal). Untuk mengganti pemilik, salin UID dari
+// Firebase Console > Authentication > Users, ganti di bawah, lalu deploy:
+//   npx firebase-tools deploy --only firestore:rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner() {
+      return request.auth != null && request.auth.uid == 'lxyI7N5lqNdb6WlCsZzAIb1ig1J2';
+    }
+
+    // Satu dokumen per data. Daftar ini harus sama dengan COLLECTIONS di src/firebase.js
+    match /{collection}/{docId} {
+      allow read, write: if isOwner() && collection in [
+        'clients', 'contracts', 'milestones', 'invoices',
+        'taxRecords', 'maintenancePlans', 'expenses', 'settings'
+      ];
+    }
+  }
+}
