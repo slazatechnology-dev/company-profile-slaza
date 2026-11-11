@@ -163,9 +163,11 @@
 import { ref, watch, onMounted, computed } from 'vue';
 import { formatRupiah } from '../../composables/useComplianceStore';
 import { formatDate } from '../../utils/finance';
-import { translations } from '../../data/translations';
+import { useI18n } from '../../composables/useI18n';
 
-const office = translations.id.contact.office;
+// Alamat & kontak kop surat = data Kontak di beranda (bisa diubah di menu Konten website)
+const { textFor } = useI18n();
+const office = computed(() => textFor('id').contact.office);
 
 const props = defineProps({
   company: { type: Object, required: true }, // store.company, diisi di menu Data PT

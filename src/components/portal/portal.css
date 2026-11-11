@@ -193,6 +193,7 @@
   margin-bottom: 16px;
 }
 
+.portal-root .field-hint,
 .portal-dialog .field-hint {
   font-size: 0.8rem;
   color: var(--text-muted);

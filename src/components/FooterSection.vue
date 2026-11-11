@@ -37,7 +37,7 @@
           © {{ currentYear }} PT. Slaza Technology Mandiri. {{ t.footer.rights }}
         </div>
         <div class="footer-location">
-          Jakarta, Indonesia
+          Malang, Indonesia
         </div>
       </div>
     </div>

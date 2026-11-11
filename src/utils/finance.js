@@ -84,3 +84,31 @@ export const unpaidByClient = (invoices, contractValue = 0) => {
   return sum(invoices.filter(i => i.status !== 'paid'))
     + Math.max(0, contractValue - sum(invoices.filter(i => i.milestoneId)));
 };
+
+// Catatan PPh per invoice dikelompokkan per masa (bulan), karena setoran PPh Final 0,5% dilakukan sekali per bulan:
+// PPh masa = 0,5% x total omzet yang diterima di bulan itu.
+// due: yang masih harus disetor (dari pembayaran yang belum punya NTPN). Jika sebagian bulan sudah disetor
+// lalu ada pembayaran baru yang tercatat di bulan yang sama, due = 0,5% dari pembayaran baru itu saja.
+export const taxByPeriod = (taxRecords) => {
+  const groups = new Map();
+  for (const rec of taxRecords) {
+    const key = `${rec.periodYear}-${String(rec.periodMonth).padStart(2, '0')}`;
+    if (!groups.has(key)) groups.set(key, { key, year: rec.periodYear, month: rec.periodMonth, records: [] });
+    groups.get(key).records.push(rec);
+  }
+  return [...groups.values()]
+    .map(g => {
+      const gross = g.records.reduce((s, r) => s + r.grossIncome, 0);
+      const unsettledGross = g.records.filter(r => !r.isSettled).reduce((s, r) => s + r.grossIncome, 0);
+      return {
+        ...g,
+        gross,
+        tax: taxOf(gross),
+        due: taxOf(unsettledGross),
+        settled: g.records.every(r => r.isSettled),
+        deadline: taxDeadline(g.month, g.year),
+        ntpns: [...new Set(g.records.map(r => r.ntpn).filter(Boolean))]
+      };
+    })
+    .sort((a, b) => b.key.localeCompare(a.key));
+};

@@ -18,14 +18,18 @@ export const translations = {
       langLabel: "Pilihan bahasa"
     },
     hero: {
-      headline: "Rekayasa Perangkat Lunak & Sistem IoT Terpadu",
-      subtext: "PT. Slaza Technology Mandiri merancang dan membangun aplikasi web, backend cloud, dan perangkat keras IoT untuk operasional perusahaan Anda.",
-      ctaPrimary: "Mulai Konsultasi Proyek",
-      ctaSecondary: "Lihat Portofolio"
+      headline: "Aplikasi web dan perangkat IoT untuk operasional perusahaan",
+      headlineAccent: "operasional perusahaan",
+      shotAlt: "Halaman top up di yaytopup.id",
+      shotCaption: "Tangkapan layar yaytopup.id, platform voucher digital buatan kami.",
+      subtext: "Kami studio rekayasa di Malang. Tim yang sama menulis aplikasi web, backend, dan firmware perangkat, jadi data dari sensor sampai ke layar Anda tidak perlu berpindah tangan ke vendor lain.",
+      ctaPrimary: "Ceritakan proyek Anda",
+      ctaSecondary: "Lihat produk yang sudah berjalan"
     },
     about: {
-      title: "Menghubungkan Solusi Digital dengan Dunia Fisik & Lapangan",
-      description: "Kami studio rekayasa teknologi independen di Jakarta. Kami mengerjakan aplikasi web dan mobile bersama perancangan perangkat keras IoT dalam satu tim.",
+      title: "Satu tim untuk software dan hardware",
+      titleAccent: "software dan hardware",
+      description: "PT. Slaza Technology Mandiri adalah studio rekayasa independen di Malang, Jawa Timur. Aplikasi web dan mobile, backend, dan perangkat keras IoT kami kerjakan dalam satu tim.",
       visionTitle: "Pendekatan Kami",
       visionText: "Kami menilai sebuah sistem dari dua hal: apakah sistem itu menyelesaikan masalah operasional klien, dan apakah tim klien masih bisa merawatnya bertahun-tahun kemudian.",
       missionTitle: "Komitmen Kerja",
@@ -33,30 +37,12 @@ export const translations = {
         "Menulis kode yang modular dan teruji.",
         "Membangun perangkat IoT yang tetap bekerja di kondisi lapangan.",
         "Melaporkan kemajuan secara terbuka dan menepati tenggat proyek."
-      ],
-      pillarsTitle: "Fondasi Rekayasa",
-      pillars: [
-        {
-          title: "Arsitektur Modular",
-          desc: "Struktur kode yang mudah dikembangkan dan dirawat tanpa ketergantungan berlebih."
-        },
-        {
-          title: "Hardware-to-Cloud",
-          desc: "Aliran data yang konsisten dari mikrokontroler sensor langsung ke server aplikasi."
-        },
-        {
-          title: "Kinerja & Reliabilitas",
-          desc: "Optimasi sistem backend dan query basis data untuk menangani volume transaksi tinggi."
-        },
-        {
-          title: "Pengujian Nyata",
-          desc: "Uji beban dan verifikasi lapangan sebelum sistem dioperasikan di lingkungan produksi."
-        }
       ]
     },
     services: {
-      title: "Kapabilitas Teknis & Layanan Rekayasa Terintegrasi",
-      subtitle: "Kami mendampingi Anda dari tahap perancangan arsitektur, implementasi kode, hingga peluncuran sistem di server produksi.",
+      title: "Yang kami kerjakan",
+      titleAccent: "kami kerjakan",
+      subtitle: "Satu proyek bisa memakai satu atau beberapa layanan di bawah ini. Kami ikut merawat sistemnya setelah berjalan di server produksi.",
       proofLabel: "Sudah berjalan di produksi:",
       items: [
         {
@@ -110,36 +96,27 @@ export const translations = {
       ]
     },
     portfolio: {
-      title: "Produk Nyata di Lapangan",
-      subtitle: "Karya yang kami rancang, bangun, dan operasikan sendiri.",
-      project: {
-        title: "yaytopup.id",
-        subtitle: "Platform Otomasi Distribusi Voucher & Produk Digital",
-        desc: "Sistem transaksi untuk pembelian produk digital dan voucher game, terintegrasi langsung dengan payment gateway nasional dan provider eksternal, dengan penyelesaian transaksi otomatis.",
-        techStack: ["Vue.js", "High-Concurrency Backend", "Payment Gateway", "Redis Queue"],
-        urlText: "Kunjungi yaytopup.id",
-        shotAlt: "Halaman top up koin di yaytopup.id",
-        shotCaption: "Tangkapan layar yaytopup.id, 13 Oktober 2026."
-      },
-      upcomingTitle: "Riset & Pengembangan IoT",
-      upcomingDesc: "Prototipe perangkat keras dan telemetri yang sedang kami kembangkan di lab internal.",
-      upcomingItems: [
+      title: "Produk yang sudah berjalan",
+      titleAccent: "sudah berjalan",
+      subtitle: "Produk yang kami bangun dan operasikan sendiri.",
+      projects: [
         {
-          tag: "Hardware Gateway",
-          title: "Slaza Telemetry Core Unit",
-          desc: "Modul gateway sensor industri dengan dukungan transmisi seluler dan penyimpanan lokal aman saat jaringan terputus.",
-          specs: "ESP32-S3 Core • RS485 Modbus • MQTT TLS"
-        },
-        {
-          tag: "Smart Monitoring",
-          title: "Power Telemetry Hub",
-          desc: "Modul pemantauan daya listrik dan konsumsi mesin industri untuk deteksi dini pemakaian abnormal.",
-          specs: "Current Transformer Sensors • Real-time Ingestion"
+          key: "yaytopup",
+          title: "yaytopup.id",
+          url: "https://yaytopup.id",
+          imageId: "bundled:yaytopup",
+          subtitle: "Platform Otomasi Distribusi Voucher & Produk Digital",
+          desc: "Sistem transaksi untuk pembelian produk digital dan voucher game, terintegrasi langsung dengan payment gateway nasional dan provider eksternal, dengan penyelesaian transaksi otomatis.",
+          techStack: ["Vue.js", "Payment Gateway", "Redis Queue"],
+          urlText: "Kunjungi yaytopup.id",
+          shotAlt: "Halaman top up koin di yaytopup.id",
+          shotCaption: "Tangkapan layar yaytopup.id, 13 Oktober 2026."
         }
       ]
     },
     contact: {
-      title: "Konsultasikan Kebutuhan Proyek Anda",
+      title: "Konsultasikan kebutuhan proyek Anda",
+      titleAccent: "proyek Anda",
       subtitle: "Diskusikan rencana pengembangan aplikasi atau perangkat pintar bersama tim rekayasa kami.",
       form: {
         title: "Tulis pesan atau rencana proyek Anda",
@@ -147,6 +124,11 @@ export const translations = {
         namePlaceholder: "Masukkan nama Anda",
         emailLabel: "Email Bisnis",
         emailPlaceholder: "nama@perusahaan.com",
+        companyLabel: "Nama Perusahaan",
+        companyPlaceholder: "Kosongkan jika perorangan",
+        budgetLabel: "Perkiraan Anggaran",
+        budgets: ["Belum tahu", "Di bawah Rp 25 juta", "Rp 25 juta sampai Rp 100 juta", "Di atas Rp 100 juta"],
+        responsePromise: "Kami membalas dalam 1×24 jam kerja.",
         phoneLabel: "Nomor Telepon / WhatsApp",
         phonePlaceholder: "0812...",
         serviceLabel: "Layanan yang Dibutuhkan",
@@ -176,11 +158,11 @@ export const translations = {
         hoursLabel: "Jam Operasional",
         hours: "Senin - Jumat: 09:00 - 18:00 WIB",
         areaTitle: "Area Layanan",
-        areaDesc: "Melayani konsultasi langsung di wilayah Jabodetabek serta kerja sama jarak jauh (remote engineering) untuk seluruh Indonesia dan regional."
+        areaDesc: "Konsultasi tatap muka di wilayah Malang Raya. Klien di kota lain kami layani jarak jauh."
       }
     },
     footer: {
-      desc: "PT. Slaza Technology Mandiri adalah studio rekayasa perangkat lunak dan integrasi sistem IoT di Jakarta.",
+      desc: "PT. Slaza Technology Mandiri adalah studio rekayasa perangkat lunak dan sistem IoT di Malang, Jawa Timur.",
       quickLinks: "Menu",
       rights: "Seluruh Hak Cipta Dilindungi."
     }
@@ -202,14 +184,18 @@ export const translations = {
       langLabel: "Language"
     },
     hero: {
-      headline: "Software Engineering & Connected IoT Systems",
-      subtext: "PT. Slaza Technology Mandiri designs and builds web applications, cloud backends, and industrial IoT hardware.",
-      ctaPrimary: "Start Project Discussion",
-      ctaSecondary: "View Work"
+      headline: "Web applications and IoT devices for company operations",
+      headlineAccent: "company operations",
+      shotAlt: "Top up page on yaytopup.id",
+      shotCaption: "Screenshot of yaytopup.id, a digital voucher platform we built.",
+      subtext: "We are an engineering studio in Malang, Indonesia. The same team writes the web app, the backend, and the device firmware, so data travels from sensor to screen without changing vendors.",
+      ctaPrimary: "Tell us about your project",
+      ctaSecondary: "See a product in production"
     },
     about: {
-      title: "Bridging Digital Software and Physical Field Operations",
-      description: "We are an independent engineering studio in Jakarta. We build web and mobile applications and design custom IoT hardware in one team.",
+      title: "One team for software and hardware",
+      titleAccent: "software and hardware",
+      description: "PT. Slaza Technology Mandiri is an independent engineering studio in Malang, East Java. We build web and mobile apps, backends, and IoT hardware in one team.",
       visionTitle: "Our Approach",
       visionText: "We judge a system by two things: whether it solves the client's operational problem, and whether the client's team can still maintain it years later.",
       missionTitle: "Engineering Commitment",
@@ -217,30 +203,12 @@ export const translations = {
         "Write modular, tested code.",
         "Build IoT hardware that keeps working in field conditions.",
         "Report progress openly and meet project deadlines."
-      ],
-      pillarsTitle: "Core Foundations",
-      pillars: [
-        {
-          title: "Modular Architecture",
-          desc: "Code structured so it is easy to extend and maintain, without unnecessary dependencies."
-        },
-        {
-          title: "Hardware-to-Cloud",
-          desc: "Consistent data flow from sensor microcontrollers straight to the application server."
-        },
-        {
-          title: "Performance & Reliability",
-          desc: "Backend and database query optimization for high transaction volumes."
-        },
-        {
-          title: "Field Testing",
-          desc: "Load testing and field verification before a system goes into production."
-        }
       ]
     },
     services: {
-      title: "Technical Capabilities & Engineering Services",
-      subtitle: "We work with you through architecture design, implementation, and deployment to production.",
+      title: "What we build",
+      titleAccent: "we build",
+      subtitle: "A project can use one or several of the services below. We keep maintaining the system after it runs in production.",
       proofLabel: "Already running in production:",
       items: [
         {
@@ -294,36 +262,27 @@ export const translations = {
       ]
     },
     portfolio: {
-      title: "Real Systems in Production",
-      subtitle: "Work we designed, built, and operate ourselves.",
-      project: {
-        title: "yaytopup.id",
-        subtitle: "Digital Voucher & Gaming Top-Up Platform",
-        desc: "An automated transaction platform for gaming vouchers and digital credits, integrated with national payment gateways and external providers, with automatic settlement.",
-        techStack: ["Vue.js", "High-Concurrency Backend", "Payment Gateway", "Redis Queue"],
-        urlText: "Visit yaytopup.id",
-        shotAlt: "Coin top-up page on yaytopup.id",
-        shotCaption: "Screenshot of yaytopup.id, 13 October 2026."
-      },
-      upcomingTitle: "IoT R&D Prototypes",
-      upcomingDesc: "Hardware and telemetry prototypes we are developing in our internal lab.",
-      upcomingItems: [
+      title: "Products already in production",
+      titleAccent: "in production",
+      subtitle: "Products we build and operate ourselves.",
+      projects: [
         {
-          tag: "Hardware Gateway",
-          title: "Slaza Telemetry Core Unit",
-          desc: "Industrial sensor gateway unit supporting cellular connectivity and fail-safe local storage.",
-          specs: "ESP32-S3 Core • RS485 Modbus • MQTT TLS"
-        },
-        {
-          tag: "Smart Monitoring",
-          title: "Power Telemetry Hub",
-          desc: "Multi-phase power consumption telemetry hub for early industrial machinery anomaly detection.",
-          specs: "Current Transformer Sensors • Real-time Ingestion"
+          key: "yaytopup",
+          title: "yaytopup.id",
+          url: "https://yaytopup.id",
+          imageId: "bundled:yaytopup",
+          subtitle: "Digital Voucher & Gaming Top-Up Platform",
+          desc: "An automated transaction platform for gaming vouchers and digital credits, integrated with national payment gateways and external providers, with automatic settlement.",
+          techStack: ["Vue.js", "Payment Gateway", "Redis Queue"],
+          urlText: "Visit yaytopup.id",
+          shotAlt: "Coin top-up page on yaytopup.id",
+          shotCaption: "Screenshot of yaytopup.id, 13 October 2026."
         }
       ]
     },
     contact: {
-      title: "Discuss Your Project",
+      title: "Discuss your project",
+      titleAccent: "your project",
       subtitle: "Talk to our engineering team about your software or connected hardware project.",
       form: {
         title: "Write your message or project plan",
@@ -331,6 +290,11 @@ export const translations = {
         namePlaceholder: "Enter your full name",
         emailLabel: "Work Email",
         emailPlaceholder: "name@company.com",
+        companyLabel: "Company Name",
+        companyPlaceholder: "Leave empty if individual",
+        budgetLabel: "Estimated Budget",
+        budgets: ["Not sure yet", "Under IDR 25 million", "IDR 25 to 100 million", "Over IDR 100 million"],
+        responsePromise: "We reply within 1 business day.",
         phoneLabel: "Phone / WhatsApp",
         phonePlaceholder: "+62 812...",
         serviceLabel: "Required Capability",
@@ -360,11 +324,11 @@ export const translations = {
         hoursLabel: "Office Hours",
         hours: "Monday - Friday: 09:00 - 18:00 WIB",
         areaTitle: "Service Area",
-        areaDesc: "In-person consultation across Greater Jakarta (Jabodetabek), and remote engineering work for clients across Indonesia and the region."
+        areaDesc: "In-person meetings in the Malang area. Clients in other cities work with us remotely."
       }
     },
     footer: {
-      desc: "PT. Slaza Technology Mandiri is an independent software and IoT engineering studio based in Jakarta.",
+      desc: "PT. Slaza Technology Mandiri is an independent software and IoT engineering studio in Malang, East Java.",
       quickLinks: "Navigation",
       rights: "All Rights Reserved."
     }

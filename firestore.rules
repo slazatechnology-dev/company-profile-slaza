@@ -10,6 +10,20 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == 'lxyI7N5lqNdb6WlCsZzAIb1ig1J2';
     }
 
+    // Konten beranda (menu "Konten website" di portal): dibaca pengunjung website, hanya pemilik yang menulis.
+    // site/home = teks semua bagian beranda, siteImages/{id} = gambar portofolio (data URL WebP).
+    match /site/{docId} {
+      allow read: if true;
+      allow write: if isOwner();
+    }
+    match /siteImages/{imageId} {
+      allow read: if true;
+      allow write: if isOwner() && request.resource.data.dataUrl is string
+        && request.resource.data.dataUrl.matches('^data:image/.*')
+        && request.resource.data.dataUrl.size() < 900000;
+      allow delete: if isOwner();
+    }
+
     // Satu dokumen per data. Daftar ini harus sama dengan COLLECTIONS di src/firebase.js
     match /{collection}/{docId} {
       allow read, write: if isOwner() && collection in [

@@ -44,3 +44,13 @@ Satu koleksi per jenis data, satu dokumen per baris. ID dokumen = `id` data. Rel
 | `maintenancePlans` | contractId, kind (`maintenance` / `server`), title, monthlyFee, billingDayOfMonth, isActive, startDate, slaDetails |
 | `expenses` | contractId (kosong = operasional PT), category, description, amount, date, vendor, receiptNote, repeat (kosong = sekali bayar, `monthly`, `yearly`), seriesId (id entri pertama biaya rutin) |
 | `settings/company` | nib, npwp, bankName, bankAccount, bankHolder (kosong = atas nama PT), registeredYear |
+| `site/home` | json (string JSON konten beranda dua bahasa, lihat `src/data/siteContent.js`), updatedAt. **Boleh dibaca publik.** |
+| `siteImages/{id}` | dataUrl (gambar portofolio WebP/JPEG < 900 KB), createdAt. **Boleh dibaca publik.** |
+
+### Konten beranda (menu Konten website)
+
+- Semua teks beranda (Hero, Tentang, Layanan, Portofolio, Kontak & footer) dalam ID dan EN bisa diubah dari portal. EN kosong = memakai teks ID.
+- Beranda membaca `site/home` lewat REST API Firestore (tanpa SDK). Jika gagal atau belum pernah disimpan, beranda memakai teks bawaan di `src/data/translations.js`.
+- Gambar diunggah dari portal, dikecilkan di browser (lebar maks 1600px), lalu disimpan di `siteImages`. Gambar yang tidak dipakai lagi dihapus saat menyimpan.
+- Alamat dan kontak di menu ini juga dipakai di kop invoice dan BAST.
+- Setelah `firestore.rules` berubah, deploy ulang: `npx firebase-tools deploy --only firestore:rules`.

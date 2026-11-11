@@ -5,11 +5,12 @@
       <p class="project-subtitle">{{ project.subtitle }}</p>
       <p class="project-desc">{{ project.desc }}</p>
 
-      <p class="mono project-stack">{{ project.techStack.join(' · ') }}</p>
+      <p v-if="project.techStack.length" class="mono project-stack">{{ project.techStack.join(' · ') }}</p>
 
       <!-- External-link icon stays: it tells the visitor this button leaves the site -->
       <a
-        href="https://yaytopup.id"
+        v-if="project.url"
+        :href="project.url"
         target="_blank"
         rel="noopener noreferrer"
         class="btn btn-primary"
@@ -24,8 +25,8 @@
       </a>
     </div>
 
-    <figure class="project-shot">
-      <img :src="screenshot" :alt="project.shotAlt" width="1280" height="800" loading="lazy" />
+    <figure v-if="image" class="project-shot">
+      <img :src="image" :alt="project.shotAlt" width="1280" height="800" loading="lazy" />
       <figcaption>{{ project.shotCaption }}</figcaption>
     </figure>
   </article>
@@ -34,19 +35,26 @@
 <script setup>
 import { computed } from 'vue';
 import { useI18n } from '../composables/useI18n';
-import screenshot from '../assets/yaytopup-2026-10-13.png';
+import { siteImageSrc } from '../composables/useSiteImage';
+
+const props = defineProps({
+  project: { type: Object, required: true }
+});
 
 const { t } = useI18n();
-const project = computed(() => t.value.portfolio.project);
+const image = computed(() => siteImageSrc(props.project.imageId));
 </script>
 
 <style scoped>
+.featured-project + .featured-project {
+  margin-top: 96px;
+}
+
 .featured-project {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
   align-items: center;
   gap: 40px 64px;
-  margin-bottom: 96px;
 }
 
 .project-content {
@@ -95,7 +103,6 @@ const project = computed(() => t.value.portfolio.project);
 @media (max-width: 960px) {
   .featured-project {
     grid-template-columns: minmax(0, 1fr);
-    margin-bottom: 64px;
   }
 }
 </style>

@@ -120,6 +120,11 @@ p {
   margin-bottom: 56px;
 }
 
+/* Frasa aksen di judul (AccentText.vue): satu-satunya pemakaian biru selain aksi, kontras 6,7:1 di atas putih */
+.accent-text {
+  color: var(--accent-primary);
+}
+
 .section-title {
   font-size: clamp(2rem, 3.8vw, 2.75rem);
   font-weight: 800;

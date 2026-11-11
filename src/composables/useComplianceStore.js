@@ -7,7 +7,7 @@ import { TaxRecordModel } from '../models/TaxRecordModel.js';
 import { MaintenancePlanModel } from '../models/MaintenancePlanModel.js';
 import { ExpenseModel } from '../models/ExpenseModel.js';
 
-import { taxOf, dateJkt, nextDocNumber, formatRupiah, dueRecurring, profitSummary, unpaidByClient, invoiceDueDate } from '../utils/finance.js';
+import { taxOf, dateJkt, nextDocNumber, formatRupiah, dueRecurring, profitSummary, unpaidByClient, invoiceDueDate, taxByPeriod } from '../utils/finance.js';
 
 export { formatRupiah };
 
@@ -129,17 +129,10 @@ export const useComplianceStore = () => {
     return paidInvoices.value.reduce((sum, inv) => sum + inv.grossAmount, 0);
   });
 
-  // Dijumlah per invoice agar pembulatannya sama dengan catatan setoran pajak
-  const totalPajakTerutang = computed(() => {
-    return paidInvoices.value.reduce((sum, inv) => sum + inv.taxAmount, 0);
-  });
-
-  const totalPajakTersisa = computed(() => {
-    const terbayar = taxRecords.value
-      .filter(t => t.isSettled)
-      .reduce((sum, t) => sum + t.taxAmount, 0);
-    return Math.max(0, totalPajakTerutang.value - terbayar);
-  });
+  // PPh Final disetor sekali per masa (bulan): 0,5% x total omzet bulan itu (lihat taxByPeriod)
+  const taxPeriods = computed(() => taxByPeriod(taxRecords.value));
+  const totalPajakTerutang = computed(() => taxPeriods.value.reduce((sum, p) => sum + p.tax, 0));
+  const totalPajakTersisa = computed(() => taxPeriods.value.reduce((sum, p) => sum + p.due, 0));
 
   const totalPengeluaran = computed(() => {
     return expenses.value.reduce((sum, exp) => sum + exp.amount, 0);
@@ -376,15 +369,15 @@ export const useComplianceStore = () => {
     issueMilestoneInvoice(milestone);
   };
 
-  // Action: Update Kode Billing & NTPN Pajak
-  const settleTaxRecord = (taxRecordId, billingCode, ntpn) => {
-    const rec = taxRecords.value.find(t => t.id === taxRecordId);
-    if (!rec) return;
-
-    rec.billingCode = billingCode;
-    rec.ntpn = ntpn;
-    rec.paymentDate = dateJkt();
-    rec.isSettled = true;
+  // Action: Catat setoran PPh satu masa. Satu kode billing & NTPN berlaku untuk semua pembayaran
+  // yang belum disetor di bulan itu; yang sudah punya NTPN tidak diubah.
+  // Jika semua pembayaran bulan itu sudah disetor, ini dipakai untuk memperbaiki salah ketik NTPN.
+  const settleTaxPeriod = (year, month, billingCode, ntpn) => {
+    const inPeriod = taxRecords.value.filter(t => t.periodYear === year && t.periodMonth === month);
+    const unsettled = inPeriod.filter(t => !t.isSettled);
+    for (const rec of unsettled.length ? unsettled : inPeriod) {
+      Object.assign(rec, { billingCode, ntpn, paymentDate: rec.isSettled ? rec.paymentDate : dateJkt(), isSettled: true });
+    }
   };
 
   // Invoice lama (sebelum ada planId) milik paket pertama kontraknya, karena dulu satu kontrak hanya punya satu paket.
@@ -441,6 +434,7 @@ export const useComplianceStore = () => {
     totalOmzetLunas,
     totalPajakTerutang,
     totalPajakTersisa,
+    taxPeriods,
     totalPengeluaran,
     projectCost,
     projectProfit,
@@ -473,7 +467,7 @@ export const useComplianceStore = () => {
     issueInvoice,
     issueBast,
     signBast,
-    settleTaxRecord,
+    settleTaxPeriod,
     generatePlanInvoice
   });
 };

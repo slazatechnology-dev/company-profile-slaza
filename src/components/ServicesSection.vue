@@ -2,7 +2,7 @@
   <section class="section-wrapper services-section" id="services">
     <div class="container">
       <div class="section-header">
-        <h2 class="section-title">{{ t.services.title }}</h2>
+        <h2 class="section-title"><AccentText :text="t.services.title" :accent="t.services.titleAccent" /></h2>
         <p class="section-subtitle">
           {{ t.services.subtitle }}
         </p>
@@ -26,8 +26,8 @@
               <li v-for="feat in service.features" :key="feat">{{ feat }}</li>
             </ul>
             <!-- Only the first service has a production case on this page, so only it links to one -->
-            <p v-if="index === 0" class="service-proof">
-              {{ t.services.proofLabel }} <a href="#portfolio">{{ t.portfolio.project.title }}</a>
+            <p v-if="index === 0 && t.portfolio.projects[0]" class="service-proof">
+              {{ t.services.proofLabel }} <a href="#portfolio">{{ t.portfolio.projects[0].title }}</a>
             </p>
           </div>
         </article>
@@ -38,6 +38,7 @@
 
 <script setup>
 import { useI18n } from '../composables/useI18n';
+import AccentText from './AccentText.vue';
 
 const { t } = useI18n();
 </script>

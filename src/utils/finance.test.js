@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dateJkt, nextDocNumber, taxOf, taxDeadline, formatDate, milestoneSteps, dueRecurring, profitSummary, invoiceDueDate, unpaidByClient } from './finance.js';
+import { dateJkt, nextDocNumber, taxOf, taxDeadline, formatDate, milestoneSteps, dueRecurring, profitSummary, invoiceDueDate, unpaidByClient, taxByPeriod } from './finance.js';
 
 test('taxDeadline tanggal 15 bulan berikutnya, Desember pindah tahun', () => {
   assert.equal(taxDeadline(10, 2026), '2026-11-15');
@@ -73,4 +73,24 @@ test('unpaidByClient: invoice belum lunas + sisa kontrak belum ditagih', () => {
   ];
   assert.equal(unpaidByClient(inv, 120), 45 + 50);
   assert.equal(unpaidByClient(inv, 50), 45);
+});
+
+test('taxByPeriod: satu setoran per bulan dari total omzet; proyek 3 bulan jadi 3 masa', () => {
+  const rec = (y, m, gross, extra = {}) => ({ periodYear: y, periodMonth: m, grossIncome: gross, isSettled: false, ntpn: '', ...extra });
+  const periods = taxByPeriod([
+    rec(2026, 9, 30_000_000),                  // DP proyek
+    rec(2026, 10, 40_000_000),                 // termin 2
+    rec(2026, 11, 30_000_000),                 // pelunasan
+    rec(2026, 11, 100_000),                    // maintenance di bulan yang sama
+    rec(2026, 11, 150, { isSettled: true, ntpn: 'A1' })
+  ]);
+  assert.deepEqual(periods.map(p => p.key), ['2026-11', '2026-10', '2026-09']);
+  const nov = periods[0];
+  assert.equal(nov.gross, 30_100_150);
+  assert.equal(nov.tax, taxOf(30_100_150));      // 0,5% dari total sebulan, bukan per invoice
+  assert.equal(nov.due, taxOf(30_100_000));      // yang sudah ber-NTPN tidak ditagih lagi
+  assert.equal(nov.settled, false);
+  assert.equal(nov.deadline, '2026-12-15');
+  assert.deepEqual(nov.ntpns, ['A1']);
+  assert.equal(periods[2].due, 150_000);         // DP 30 juta -> Rp150.000
 });

@@ -163,7 +163,7 @@
 <script setup>
 import { computed, reactive } from 'vue';
 import { formatRupiah } from '../../composables/useComplianceStore';
-import { dateJkt, formatDate, taxDeadline } from '../../utils/finance';
+import { dateJkt, formatDate } from '../../utils/finance';
 import { askConfirm, showNotice } from '../../composables/useConfirm';
 
 const props = defineProps({
@@ -227,16 +227,20 @@ const todoItems = computed(() => {
   const today = dateJkt();
   const items = [];
 
-  for (const rec of s.taxRecords.filter(t => !t.isSettled)) {
-    const due = taxDeadline(rec.periodMonth, rec.periodYear);
+  // Satu tugas per masa (bulan), bukan per invoice: PPh Final disetor sekali sebulan
+  for (const p of s.taxPeriods.filter(p => p.due > 0)) {
+    const label = new Date(Date.UTC(p.year, p.month - 1, 1)).toLocaleDateString('id-ID', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+    const running = `${p.year}-${String(p.month).padStart(2, '0')}` === today.slice(0, 7);
     items.push({
-      id: rec.id,
+      id: `tax-${p.key}`,
       kind: 'Pajak',
-      title: `Setor PPh Final ${formatRupiah(rec.taxAmount)} untuk masa ${rec.periodMonth}/${rec.periodYear}`,
-      detail: `Paling lambat ${formatDate(due)}. Buat kode billing, bayar, lalu catat NTPN-nya.`,
-      cta: 'Catat NTPN',
+      title: `Setor PPh Final ${formatRupiah(p.due)} untuk masa ${label}`,
+      detail: running
+        ? `Bulan berjalan: angka bisa bertambah sampai akhir bulan. Setor setelah ${label} berakhir, paling lambat ${formatDate(p.deadline)}.`
+        : `Dari ${p.records.length} pembayaran. Paling lambat ${formatDate(p.deadline)}. Buat kode billing, bayar, lalu catat NTPN-nya.`,
+      cta: 'Buka pajak',
       tab: 'taxes',
-      due
+      due: p.deadline
     });
   }
 

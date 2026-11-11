@@ -49,7 +49,8 @@ const tabs = [
   { id: 'taxes', label: 'Pajak PPh 0,5%' },
   { id: 'lkpm', label: 'LKPM' },
   { id: 'expenses', label: 'Pengeluaran' },
-  { id: 'company', label: 'Data PT' }
+  { id: 'company', label: 'Data PT' },
+  { id: 'site', label: 'Konten website' }
 ];
 </script>
 

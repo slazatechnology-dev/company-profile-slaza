@@ -59,6 +59,7 @@
         <LkpmExportView v-else-if="activeTab === 'lkpm'" :store="store" />
         <ExpenseLedgerView v-else-if="activeTab === 'expenses'" :store="store" />
         <CompanyView v-else-if="activeTab === 'company'" :store="store" />
+        <SiteContentView v-else-if="activeTab === 'site'" />
       </template>
     </main>
 
@@ -82,6 +83,7 @@ import TaxComplianceView from './TaxComplianceView.vue';
 import LkpmExportView from './LkpmExportView.vue';
 import ExpenseLedgerView from './ExpenseLedgerView.vue';
 import CompanyView from './CompanyView.vue';
+import SiteContentView from './SiteContentView.vue';
 import ConfirmDialog from './ConfirmDialog.vue';
 import './portal.css';
 

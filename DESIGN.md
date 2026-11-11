@@ -13,6 +13,7 @@ Digital Product & Industrial IoT Engineering Studio
 
 - **ENERGY: 2 (Balanced)** — Bold typography and clear visual contrast without visual screaming or neon gimmicks.
 - **RHYTHM: 2 (Structured)** — Editorial pacing; clean alternating layouts between hero narrative, deep-dive case study, capability breakdown, and direct consultation.
+- **Dial:** ENERGY 2 / RHYTHM 2 / MOTION 1
 - **MOTION: 1 (Calm)** — Intentional micro-interactions only (smooth button hovers, subtle card border highlights, clean navigation transition). Zero continuous looping animations, zero pulsing status dots, zero simulated sensor graphs.
 
 ## 3. Color System (Strict Palette Restraint)
@@ -23,7 +24,9 @@ Digital Product & Industrial IoT Engineering Studio
   - Headings & Primary Text: Pitch Charcoal (`#09090b`) — high readability, crisp contrast (15:1+ against white).
   - Body Text: Deep Slate (`#334155`).
   - Metadata / Subtitles: Muted Neutral (`#64748b`).
-- **Single Accent:** Royal Cobalt (`#1d4ed8`) — reserved strictly for primary actions, active link states, and focused interactions.
+- **Single Accent:** Royal Cobalt (`#1d4ed8`) for primary actions, active link states, and focused interactions.
+- **Accent phrase in headings (identity motif, owner decision 2026-11-11, referensi gits.id):** the hero headline and every section title color one key phrase in Royal Cobalt (`AccentText.vue`, `.accent-text`). One phrase per heading, never body text, never a second accent color.
+- **Hero visual:** a real product screenshot (yaytopup.id) on the right. No stock photos, 3D renders, or illustrations until real photos of hardware, team, or office exist.
 - **Dark Neutral Accents:** Deep Navy/Black (`#0f172a`) for select high-contrast callouts or footer base.
 
 ## 4. Typography Rules

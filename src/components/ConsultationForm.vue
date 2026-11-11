@@ -38,6 +38,18 @@
 
       <div class="form-row">
         <div class="form-group">
+          <label class="form-label" for="client-company">{{ form.companyLabel }}</label>
+          <input
+            id="client-company"
+            v-model="formData.company"
+            type="text"
+            class="form-input"
+            :placeholder="form.companyPlaceholder"
+            autocomplete="organization"
+          />
+        </div>
+
+        <div class="form-group">
           <label class="form-label" for="client-phone">{{ form.phoneLabel }}</label>
           <input
             id="client-phone"
@@ -48,7 +60,9 @@
             autocomplete="tel"
           />
         </div>
+      </div>
 
+      <div class="form-row">
         <div class="form-group">
           <label class="form-label" for="client-service">{{ form.serviceLabel }}</label>
           <select
@@ -58,6 +72,15 @@
           >
             <option v-for="(srv, idx) in form.services" :key="idx" :value="idx">
               {{ srv }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="client-budget">{{ form.budgetLabel }}</label>
+          <select id="client-budget" v-model="formData.budget" class="form-select">
+            <option v-for="(budget, idx) in form.budgets" :key="idx" :value="idx">
+              {{ budget }}
             </option>
           </select>
         </div>
@@ -80,7 +103,7 @@
       <button type="submit" class="btn btn-primary form-submit-btn">
         {{ form.submitBtn }}
       </button>
-      <p class="form-note">{{ form.note }}</p>
+      <p class="form-note"><strong class="form-promise">{{ form.responsePromise }}</strong> {{ form.note }}</p>
 
       <!-- Always in the DOM so screen readers announce the text when it appears -->
       <p class="form-status" role="status">
@@ -106,7 +129,9 @@ const formData = reactive({
   name: '',
   email: '',
   phone: '',
+  company: '',
   service: 0,
+  budget: 0,
   message: ''
 });
 
@@ -116,8 +141,10 @@ const whatsappUrl = computed(() => {
     '',
     `${form.value.nameLabel}: ${formData.name}`,
     `${form.value.emailLabel}: ${formData.email}`,
+    ...(formData.company ? [`${form.value.companyLabel}: ${formData.company}`] : []),
     ...(formData.phone ? [`${form.value.phoneLabel}: ${formData.phone}`] : []),
     `${form.value.serviceLabel}: ${form.value.services[formData.service]}`,
+    `${form.value.budgetLabel}: ${form.value.budgets[formData.budget]}`,
     '',
     formData.message
   ].join('\n');
@@ -131,6 +158,10 @@ const openWhatsApp = () => {
 </script>
 
 <style scoped>
+.form-promise {
+  color: var(--text-primary);
+}
+
 .form-card {
   padding: 40px;
   background-color: #ffffff;

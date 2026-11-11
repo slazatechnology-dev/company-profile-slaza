@@ -3,7 +3,7 @@
     <div class="container">
       <!-- Section Header -->
       <div class="section-header">
-        <h2 class="section-title">{{ t.contact.title }}</h2>
+        <h2 class="section-title"><AccentText :text="t.contact.title" :accent="t.contact.titleAccent" /></h2>
         <p class="section-subtitle">
           {{ t.contact.subtitle }}
         </p>
@@ -24,6 +24,7 @@
 import ConsultationForm from './ConsultationForm.vue';
 import OfficeLocationCard from './OfficeLocationCard.vue';
 import { useI18n } from '../composables/useI18n';
+import AccentText from './AccentText.vue';
 
 const { t } = useI18n();
 </script>
