@@ -126,7 +126,8 @@ export const useComplianceStore = () => {
   const paidInvoices = computed(() => invoices.value.filter(inv => inv.status === 'paid'));
 
   const totalOmzetLunas = computed(() => {
-    return paidInvoices.value.reduce((sum, inv) => sum + inv.grossAmount, 0);
+    // Talangan bukan omzet
+    return paidInvoices.value.reduce((sum, inv) => sum + inv.grossAmount - inv.reimbursedAmount, 0);
   });
 
   // PPh Final disetor sekali per masa (bulan): 0,5% x total omzet bulan itu (lihat taxByPeriod)
@@ -181,7 +182,7 @@ export const useComplianceStore = () => {
       deadline: firstHalf ? `${year}-07-10` : `${Number(year) + 1}-01-10`,
       totalRevenue: paidInvoices.value
         .filter(inv => inPeriod(inv.paidDate))
-        .reduce((sum, inv) => sum + inv.grossAmount, 0),
+        .reduce((sum, inv) => sum + inv.grossAmount - inv.reimbursedAmount, 0),
       totalModalKerjaRealisasi: expenses.value
         .filter(e => inPeriod(e.date))
         .reduce((sum, e) => sum + e.amount, 0)
@@ -196,6 +197,59 @@ export const useComplianceStore = () => {
     .find(c => c.id === ms.contractId)?.addenda
     .find(a => a.id === ms.addendumId || (!ms.addendumId && ms.title === `Tambahan: ${a.title}`));
   const isBastPending = (milestone) => !!milestone && milestone.isBastRequired && !milestone.isBastSigned;
+  // Talangan: penggantian biaya pihak ketiga (domain, server, lisensi atas nama klien) sebesar harga beli.
+  // Bukan omzet PT (pajaknya sudah dibayar ke penjual), jadi tidak kena PPh Final 0,5% dan tidak masuk omzet/LKPM.
+  const isReimbursement = (ms) => !!ms && (ms.isReimbursement || !!milestoneAddendum(ms)?.isReimbursement);
+
+  // Hitung ulang bagian talangan & PPh satu invoice. Jika sudah lunas, catatan PPh yang belum disetor ikut disesuaikan
+  // (dibuat, diubah, atau dihapus). Catatan yang sudah ber-NTPN tidak diubah; fungsi ini lalu mengembalikan pesannya.
+  const refreshInvoiceTax = (invoice) => {
+    if (!invoice) return '';
+    const reimbursed = invoice.lines
+      .filter(l => isReimbursement(findMilestone(l.milestoneId)))
+      .reduce((sum, l) => sum + l.amount, 0);
+    const taxable = Math.max(0, invoice.grossAmount - reimbursed);
+    invoice.reimbursedAmount = reimbursed;
+    invoice.taxAmount = taxOf(taxable);
+    if (invoice.status !== 'paid') return '';
+
+    const rec = taxRecords.value.find(t => t.invoiceId === invoice.id);
+    if (rec?.isSettled) {
+      return rec.grossIncome === taxable ? '' : `PPh ${invoice.invoiceNumber} sudah disetor (NTPN ${rec.ntpn}), jadi catatan pajaknya tidak diubah.`;
+    }
+    if (!taxable) {
+      if (rec) taxRecords.value = taxRecords.value.filter(t => t.id !== rec.id);
+    } else if (rec) {
+      Object.assign(rec, { grossIncome: taxable, taxAmount: invoice.taxAmount });
+    } else {
+      const paid = invoice.paidDate || dateJkt();
+      taxRecords.value.push(new TaxRecordModel({
+        invoiceId: invoice.id,
+        periodYear: Number(paid.slice(0, 4)),
+        periodMonth: Number(paid.slice(5, 7)),
+        grossIncome: taxable,
+        taxAmount: invoice.taxAmount,
+        isSettled: false
+      }));
+    }
+    return '';
+  };
+
+  // Action: Tandai invoice termin (juga yang sudah lunas) sebagai talangan, langsung dari menu Pajak.
+  // Mengembalikan '' jika berhasil, atau alasan jika tidak bisa.
+  const markInvoiceReimbursement = (invoiceId) => {
+    const invoice = invoices.value.find(i => i.id === invoiceId);
+    if (!invoice) return 'Invoice tidak ditemukan.';
+    const termins = invoice.lines.map(l => findMilestone(l.milestoneId)).filter(Boolean);
+    if (!termins.length) return 'Ini tagihan rutin, bukan termin. Talangan hanya untuk termin atau tambahan kontrak.';
+    if (invoice.lines.length > 1) return `${invoice.invoiceNumber} adalah invoice gabungan. Tandai talangan per baris lewat tombol Ubah di termin masing-masing (menu Proyek).`;
+    termins.forEach(m => { m.isReimbursement = true; });
+    return refreshInvoiceTax(invoice);
+  };
+
+  // Dipanggil setelah termin diubah (misalnya penanda talangan dicentang): invoice & PPh-nya ikut menyesuaikan
+  const refreshMilestoneTax = (milestoneId) => refreshInvoiceTax(invoiceOfMilestone(milestoneId));
+
   // Sisa nilai yang belum dibuatkan invoice: kontrak awal (addendumId '') atau satu tambahan kontrak
   const uninvoicedValue = (contractId, addendumId = '') => {
     const contract = contracts.value.find(c => c.id === contractId);
@@ -226,6 +280,7 @@ export const useComplianceStore = () => {
         status: 'sent'
       }));
       invoice = invoices.value.at(-1); // ambil versi reaktif dari array
+      refreshInvoiceTax(invoice);
     }
     if (milestone.status !== 'paid') milestone.status = 'invoiced';
     return invoice;
@@ -243,15 +298,7 @@ export const useComplianceStore = () => {
     invoice.status = 'paid';
     invoice.paidDate = dateJkt();
     paidMilestones.forEach(m => { m.status = 'paid'; });
-
-    if (!taxRecords.value.some(t => t.invoiceId === invoice.id)) {
-      taxRecords.value.push(new TaxRecordModel({
-        invoiceId: invoice.id,
-        grossIncome: invoice.grossAmount,
-        taxAmount: invoice.taxAmount,
-        isSettled: false
-      }));
-    }
+    refreshInvoiceTax(invoice); // buat catatan PPh dari bagian yang bukan talangan
     return true;
   };
 
@@ -346,7 +393,9 @@ export const useComplianceStore = () => {
       taxAmount: taxOf(gross),
       status: 'sent'
     }));
-    return invoices.value.at(-1);
+    const created = invoices.value.at(-1);
+    refreshInvoiceTax(created);
+    return created;
   };
 
   // Invoice yang belum bisa dicatat lunas karena ada termin di dalamnya yang masih menunggu BAST
@@ -459,6 +508,9 @@ export const useComplianceStore = () => {
     mergeableInvoice,
     isBastPending,
     milestoneAddendum,
+    isReimbursement,
+    refreshMilestoneTax,
+    markInvoiceReimbursement,
     uninvoicedValue,
     planIssuedThisMonth,
     cancelRecurringInvoice,

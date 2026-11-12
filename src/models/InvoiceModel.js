@@ -14,7 +14,8 @@ export class InvoiceModel {
     description = '',
     grossAmount = 0,
     taxRate = TAX_RATE,
-    taxAmount = 0,
+    taxAmount = null, // null = hitung 0,5% dari grossAmount; 0 berarti memang tidak kena PPh (talangan)
+    reimbursedAmount = 0, // bagian penggantian biaya (talangan): bukan omzet, tidak kena PPh
     status = 'sent', // 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled' (digabung ke invoice lain, lihat notes)
     issueDate = dateJkt(),
     dueDate = '',
@@ -32,7 +33,10 @@ export class InvoiceModel {
     this.description = description;
     this.grossAmount = Number(grossAmount) || 0;
     this.taxRate = Number(taxRate) || TAX_RATE;
-    this.taxAmount = Number(taxAmount) || Math.round(this.grossAmount * this.taxRate);
+    this.taxAmount = taxAmount === null || taxAmount === undefined || taxAmount === ''
+      ? Math.round(this.grossAmount * this.taxRate)
+      : Number(taxAmount) || 0;
+    this.reimbursedAmount = Number(reimbursedAmount) || 0;
     this.status = status;
     this.issueDate = issueDate;
     this.dueDate = dueDate;
@@ -64,6 +68,7 @@ export class InvoiceModel {
       grossAmount: this.grossAmount,
       taxRate: this.taxRate,
       taxAmount: this.taxAmount,
+      reimbursedAmount: this.reimbursedAmount,
       status: this.status,
       issueDate: this.issueDate,
       dueDate: this.dueDate,

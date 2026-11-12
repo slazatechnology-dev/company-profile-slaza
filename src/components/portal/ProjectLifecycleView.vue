@@ -135,7 +135,10 @@
           <ol v-if="group.items.length" class="milestones">
             <li v-for="ms in group.items" :key="ms.id" class="milestone">
               <div class="ms-info">
-                <p class="ms-title">{{ ms.title }}</p>
+                <p class="ms-title">
+                  {{ ms.title }}
+                  <span v-if="store.isReimbursement(ms)" class="tag" title="Penggantian biaya pihak ketiga: tidak dihitung omzet, tidak kena PPh 0,5%">Talangan</span>
+                </p>
                 <p class="ms-meta">{{ ms.percentage }}% · <strong>{{ formatRupiah(ms.amount) }}</strong></p>
                 <!-- Satu baris tahap menggantikan tag status: terlihat sudah sampai mana dan apa berikutnya -->
                 <ol class="steps" :aria-label="`Tahap ${ms.title}`">
@@ -427,7 +430,7 @@ const recordPayment = async (ms) => {
   if (combined?.items.length) return recordInvoicePaid(combined);
   if (await askConfirm({
     title: 'Pembayaran sudah masuk?',
-    facts: [['Termin', ms.title], ['Jumlah', formatRupiah(ms.amount)], ['PPh Final 0,5% yang harus disetor', formatRupiah(taxOf(ms.amount))]],
+    facts: [['Termin', ms.title], ['Jumlah', formatRupiah(ms.amount)], ['PPh Final 0,5% yang harus disetor', props.store.isReimbursement(ms) ? 'Tidak ada (talangan)' : formatRupiah(taxOf(ms.amount))]],
     note: 'Tidak bisa dibatalkan.',
     confirmLabel: 'Ya, dana sudah masuk'
   })) {

@@ -168,6 +168,7 @@ const CATEGORIES = {
   cloudAndInfrastructure: 'Server, hosting & domain',
   iotHardwareAndPrototyping: 'Hardware IoT & prototipe',
   officeAndTools: 'Alat kerja & lisensi software',
+  taxesAndStamps: 'Pajak lain & meterai',
   otherOperational: 'Operasional lainnya'
 };
 
@@ -176,6 +177,7 @@ const HINTS = {
   cloudAndInfrastructure: 'Contoh: VPS 4GB produksi, domain klien.co.id',
   iotHardwareAndPrototyping: 'Contoh: 5 modul ESP32 dan sensor suhu',
   officeAndTools: 'Contoh: lisensi Figma, GitHub Team',
+  taxesAndStamps: 'Contoh: meterai kontrak, setoran PPh 21 honor freelancer, PBB. Jangan catat PPh Final 0,5% di sini, karena sudah dihitung otomatis di menu Pajak dan laba.',
   otherOperational: 'Contoh: biaya transfer bank, meterai'
 };
 

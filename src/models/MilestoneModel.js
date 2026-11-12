@@ -13,6 +13,7 @@ export class MilestoneModel {
     status = 'pending', // 'pending' | 'readyToInvoice' | 'invoiced' | 'paid'
     dueDate = '',
     isBastRequired = false,
+    isReimbursement = false, // penggantian biaya pihak ketiga (talangan): tidak kena PPh 0,5%
     isBastSigned = false,
     bastNumber = '',
     bastDate = ''
@@ -27,6 +28,7 @@ export class MilestoneModel {
     this.status = status;
     this.dueDate = dueDate;
     this.isBastRequired = Boolean(isBastRequired);
+    this.isReimbursement = Boolean(isReimbursement);
     this.isBastSigned = Boolean(isBastSigned);
     this.bastNumber = bastNumber;
     this.bastDate = bastDate;
@@ -49,6 +51,7 @@ export class MilestoneModel {
       status: this.status,
       dueDate: this.dueDate,
       isBastRequired: this.isBastRequired,
+      isReimbursement: this.isReimbursement,
       isBastSigned: this.isBastSigned,
       bastNumber: this.bastNumber,
       bastDate: this.bastDate

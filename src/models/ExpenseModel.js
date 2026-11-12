@@ -6,7 +6,7 @@ import { dateJkt } from '../utils/finance.js';
 export class ExpenseModel {
   constructor({
     id = '',
-    category = 'iotHardwareAndPrototyping', // 'teamAndFreelancer' | 'cloudAndInfrastructure' | 'iotHardwareAndPrototyping' | 'officeAndTools' | 'otherOperational'
+    category = 'iotHardwareAndPrototyping', // 'teamAndFreelancer' | 'cloudAndInfrastructure' | 'iotHardwareAndPrototyping' | 'officeAndTools' | 'taxesAndStamps' | 'otherOperational'
     contractId = '', // '' = operasional PT umum, bukan biaya proyek tertentu
     repeat = '', // '' | 'monthly' | 'yearly': biaya rutin (server, domain, langganan)
     seriesId = '', // entri pertama biaya rutin; '' = entri ini sendiri yang pertama

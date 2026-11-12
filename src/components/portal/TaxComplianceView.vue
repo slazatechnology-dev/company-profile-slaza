@@ -19,9 +19,10 @@
 
       <h3 class="steps-title">Cara setor</h3>
       <ol class="steps">
-        <li>Buat kode billing di DJP Online: kode akun pajak <span class="mono">411128</span>, kode jenis setoran <span class="mono">420</span>.</li>
-        <li>Bayar lewat m-banking, internet banking, atau teller.</li>
-        <li>Satu kode billing untuk total satu bulan. Catat kode billing dan NTPN-nya di daftar per bulan di bawah.</li>
+        <li>Setelah bulannya berakhir, buka <strong>Isian kode billing</strong> di bulan itu (daftar di bawah).</li>
+        <li>Masuk ke <a href="https://coretaxdjp.pajak.go.id" target="_blank" rel="noopener noreferrer">Coretax DJP</a> dengan akun PT, lalu buat kode billing (menu Pembayaran, Layanan Mandiri Kode Billing). Salin isiannya satu per satu.</li>
+        <li>Bayar kode billing lewat m-banking, internet banking, atau teller sebelum tenggat.</li>
+        <li>Klik <strong>Catat setoran</strong> di bulan itu, lalu isi kode billing dan NTPN dari bukti bayar.</li>
       </ol>
     </section>
 
@@ -93,6 +94,24 @@
             </button>
           </div>
 
+          <!-- Isian persis seperti formulir kode billing DJP, dengan tombol salin per baris -->
+          <details v-if="!p.settled" class="period-detail">
+            <summary>Isian kode billing DJP</summary>
+            <dl class="billing-fields">
+              <div v-for="f in billingFields(p)" :key="f.label">
+                <dt>{{ f.label }}</dt>
+                <dd>
+                  <span :class="{ mono: f.mono }">{{ f.value }}</span>
+                  <span v-if="f.note" class="muted small">{{ f.note }}</span>
+                </dd>
+                <button v-if="f.copy" type="button" class="btn-text copy-btn" :aria-label="`Salin ${f.label}`" @click="copy(f, p)">
+                  {{ copied === f.label + p.key ? 'Tersalin' : 'Salin' }}
+                </button>
+              </div>
+            </dl>
+            <p v-if="!store.company.npwp" class="muted small">NPWP PT belum diisi. Lengkapi di menu Data PT.</p>
+          </details>
+
           <details class="period-detail">
             <summary>Rincian pembayaran</summary>
             <table class="data-table">
@@ -105,6 +124,18 @@
                   <td class="nowrap">{{ formatDate(invoiceOf(rec)?.paidDate) }}</td>
                   <td class="num">{{ formatRupiah(rec.grossIncome) }}</td>
                   <td><span class="tag" :class="rec.isSettled ? 'ok' : 'wait'">{{ rec.isSettled ? 'Disetor' : 'Belum' }}</span></td>
+                  <td>
+                    <!-- Biaya pihak ketiga yang diganti klien (domain, server) bukan omzet: hapus dari setoran -->
+                    <button
+                      v-if="!rec.isSettled && invoiceOf(rec)?.milestoneId"
+                      type="button"
+                      class="btn-text"
+                      :aria-label="`Tandai ${invoiceOf(rec)?.invoiceNumber} sebagai talangan`"
+                      @click="markReimbursement(rec)"
+                    >
+                      Tandai talangan
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -162,6 +193,7 @@ import { ref, reactive, computed } from 'vue';
 import { formatRupiah } from '../../composables/useComplianceStore';
 import { dateJkt, formatDate, taxDeadline } from '../../utils/finance';
 import FormDialog from './FormDialog.vue';
+import { askConfirm, showNotice } from '../../composables/useConfirm';
 
 const props = defineProps({
   store: { type: Object, required: true }
@@ -179,6 +211,33 @@ const periodLabel = (year, month) => new Date(Date.UTC(year, month - 1, 1))
   .toLocaleDateString('id-ID', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 const isRunning = (p) => p.year === thisYear && p.month === thisMonth;
 const isLate = (p) => p.due > 0 && today > p.deadline;
+// Nilai yang diisi di formulir kode billing (Coretax / e-Billing DJP) untuk PPh Final 0,5% PP 55/2022
+const billingFields = (p) => {
+  const month = new Date(Date.UTC(p.year, p.month - 1, 1)).toLocaleDateString('id-ID', { month: 'long', timeZone: 'UTC' });
+  const npwp = props.store.company.npwp || '-';
+  return [
+    { label: 'NPWP', value: npwp, mono: true, copy: npwp !== '-' ? npwp : '' },
+    { label: 'Kode akun pajak (KAP)', value: '411128', note: 'PPh Final', mono: true, copy: '411128' },
+    { label: 'Kode jenis setoran (KJS)', value: '420', note: 'PPh Final atas penghasilan usaha dengan peredaran bruto tertentu (PP 55/2022)', mono: true, copy: '420' },
+    { label: 'Masa pajak', value: `${month} sampai ${month}`, note: `bulan ${p.month}` },
+    { label: 'Tahun pajak', value: String(p.year), mono: true, copy: String(p.year) },
+    { label: 'Jumlah setor', value: formatRupiah(p.due), mono: true, copy: String(p.due) },
+    { label: 'Uraian (boleh diisi)', value: `PPh Final 0,5% PP 55/2022 masa ${month} ${p.year}, omzet ${formatRupiah(p.gross)}`, copy: `PPh Final 0,5% PP 55/2022 masa ${month} ${p.year}, omzet ${formatRupiah(p.gross)}` }
+  ];
+};
+
+const copied = ref('');
+const copy = async (f, p) => {
+  try {
+    await navigator.clipboard.writeText(f.copy);
+    copied.value = f.label + p.key;
+    setTimeout(() => { if (copied.value === f.label + p.key) copied.value = ''; }, 2000);
+  } catch {
+    copied.value = '';
+    showNotice({ title: 'Gagal menyalin', message: `Salin manual: ${f.copy}` });
+  }
+};
+
 const invoiceOf = (rec) => props.store.invoices.find(i => i.id === rec.invoiceId);
 
 const isOpen = ref(false);
@@ -196,6 +255,21 @@ const openSettle = (p) => {
     ntpn: p.settled ? last?.ntpn || '' : ''
   });
   isOpen.value = true;
+};
+
+const markReimbursement = async (rec) => {
+  const inv = invoiceOf(rec);
+  if (!inv) return;
+  const ok = await askConfirm({
+    title: `Tandai ${inv.invoiceNumber} sebagai talangan?`,
+    message: 'Untuk biaya pihak ketiga yang kamu bayarkan dulu lalu diganti klien sebesar harga beli (misalnya domain atau server atas nama klien). Pajaknya sudah dibayar ke penjual.',
+    facts: [['Untuk', inv.description], ['Jumlah', formatRupiah(inv.grossAmount)], ['PPh yang dihapus dari setoran', formatRupiah(rec.taxAmount)]],
+    note: 'Pembayaran ini tidak lagi dihitung sebagai omzet. Simpan bukti pembelian dari pihak ketiga.',
+    confirmLabel: 'Ya, ini talangan'
+  });
+  if (!ok) return;
+  const reason = props.store.markInvoiceReimbursement(inv.id);
+  if (reason) showNotice({ title: 'Belum bisa ditandai', message: reason });
 };
 
 // Format sudah diperiksa browser lewat atribut pattern/required sebelum submit.
@@ -298,6 +372,55 @@ const saveNtpn = () => {
 .period-detail summary:focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
+}
+
+.billing-fields {
+  margin: 4px 0 12px;
+  padding: 4px 14px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.billing-fields div {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 16px;
+  padding: 6px 0;
+  font-size: 0.9rem;
+}
+
+.billing-fields div + div {
+  border-top: 1px solid var(--card-border);
+}
+
+.billing-fields dt {
+  color: var(--text-muted);
+}
+
+.billing-fields dd {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.billing-fields dd .small {
+  font-weight: 400;
+}
+
+.copy-btn {
+  font-size: 0.85rem;
+}
+
+@media (max-width: 640px) {
+  .billing-fields div {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .billing-fields dt {
+    grid-column: 1 / -1;
+  }
 }
 
 .cell-sub {

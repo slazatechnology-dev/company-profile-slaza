@@ -81,6 +81,12 @@
               <td class="text-right"><strong>Total tagihan</strong></td>
               <td class="text-right total-amount"><strong>{{ formatRupiah(invoiceData.grossAmount) }}</strong></td>
             </tr>
+            <!-- Talangan: dicantumkan supaya klien tahu bagian ini penggantian biaya, bukan jasa -->
+            <tr v-if="invoiceData.reimbursedAmount > 0">
+              <td colspan="2" class="text-right reimb-note">
+                Termasuk penggantian biaya pihak ketiga {{ formatRupiah(invoiceData.reimbursedAmount) }} (sesuai bukti pembelian, tanpa tambahan biaya jasa).
+              </td>
+            </tr>
           </tfoot>
         </table>
 
@@ -223,6 +229,11 @@ const printDocument = () => {
 </script>
 
 <style scoped>
+.reimb-note {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
 /* Bayangan menandai dokumen berada di atas halaman; tanpa blur karena latar tidak perlu disamarkan */
 .doc-dialog {
   margin: auto; /* reset global "* { margin: 0 }" menghapus centering bawaan <dialog> */

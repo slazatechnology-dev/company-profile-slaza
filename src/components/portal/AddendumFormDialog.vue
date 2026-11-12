@@ -33,6 +33,12 @@
       <p id="ad-desc-hint" class="field-hint">Rincian fitur, alasan perubahan, atau kesepakatan dengan klien. Boleh beberapa baris.</p>
     </div>
 
+    <label class="check">
+      <input v-model="form.isReimbursement" type="checkbox" aria-describedby="ad-reimb-hint" />
+      <span>Penggantian biaya (talangan), tidak kena PPh 0,5%</span>
+    </label>
+    <p id="ad-reimb-hint" class="field-hint">Untuk biaya pihak ketiga yang kamu bayarkan dulu lalu diganti klien sebesar harga beli, misalnya domain, server, atau lisensi atas nama klien. Pajaknya sudah dibayar ke penjual, jadi tidak dihitung sebagai omzet dan tidak kena PPh 0,5%.</p>
+
     <!-- Tambahan baru biasanya ditagih tersendiri: langsung buatkan termin-nya supaya tidak perlu langkah terpisah -->
     <template v-if="!form.id">
       <label class="check">
@@ -63,13 +69,13 @@ const props = defineProps({
 
 const emit = defineEmits(['update:open']);
 
-const form = reactive({ id: '', title: '', value: null, date: '', description: '' });
+const form = reactive({ id: '', title: '', value: null, date: '', description: '', isReimbursement: false });
 const withMilestone = ref(true);
 const withBast = ref(true);
 
 watch(() => props.open, (open) => {
   if (!open) return;
-  Object.assign(form, props.addendum ? { ...props.addendum } : { id: '', title: '', value: null, date: dateJkt(), description: '' });
+  Object.assign(form, props.addendum ? { ...props.addendum } : { id: '', title: '', value: null, date: dateJkt(), description: '', isReimbursement: false });
   withMilestone.value = true;
   withBast.value = true;
 }, { immediate: true });
@@ -91,7 +97,8 @@ const save = () => {
       type: 'finalSettlement',
       amount: item.value,
       percentage: 100,
-      isBastRequired: withBast.value
+      isBastRequired: withBast.value,
+      isReimbursement: item.isReimbursement
     });
   }
   emit('update:open', false);

@@ -61,6 +61,12 @@
       </p>
     </div>
 
+    <label class="check">
+      <input v-model="form.isReimbursement" type="checkbox" aria-describedby="ms-reimb-hint" />
+      <span>Penggantian biaya (talangan), tidak kena PPh 0,5%</span>
+    </label>
+    <p id="ms-reimb-hint" class="field-hint reimb-hint">Untuk biaya pihak ketiga yang kamu bayarkan dulu lalu diganti klien sebesar harga beli, misalnya domain, server, atau lisensi atas nama klien. Pajaknya sudah dibayar ke penjual, jadi tidak dihitung sebagai omzet dan tidak kena PPh 0,5%.</p>
+
     <label v-if="!issueNow" class="check">
       <input v-model="form.isBastRequired" type="checkbox" :aria-describedby="form.bastNumber ? 'ms-bast-hint' : undefined" />
       <span>Wajib BAST sebelum pembayaran termin ini dicatat</span>
@@ -80,7 +86,7 @@ import { MilestoneModel } from '../../models/MilestoneModel';
 import { formatRupiah } from '../../utils/finance';
 import FormDialog from './FormDialog.vue';
 import MoneyInput from './MoneyInput.vue';
-import { askConfirm } from '../../composables/useConfirm';
+import { askConfirm, showNotice } from '../../composables/useConfirm';
 
 const props = defineProps({
   store: { type: Object, required: true },
@@ -122,6 +128,9 @@ const fillRemaining = () => {
 const save = () => {
   const id = props.store.saveRecord('milestones', { ...form, percentage: percentage.value, isBastRequired: props.issueNow ? false : form.isBastRequired });
   if (props.issueNow) emit('issued', props.store.issueInvoice(id));
+  // Invoice yang sudah terbit (dan catatan PPh-nya jika sudah lunas) ikut menyesuaikan penanda talangan
+  const note = props.store.refreshMilestoneTax(id);
+  if (note) showNotice({ title: 'Catatan pajak tidak diubah', message: note });
   emit('update:open', false);
 };
 
@@ -139,6 +148,10 @@ const remove = async () => {
 </script>
 
 <style scoped>
+.reimb-hint {
+  margin: -8px 0 12px 30px;
+}
+
 .remaining {
   display: flex;
   justify-content: space-between;

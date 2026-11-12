@@ -25,6 +25,7 @@
           <input v-model="row.checked" type="checkbox" :disabled="!!row.note" />
           <span>
             <strong>{{ row.addendumTitle }}</strong> · {{ row.label }}
+            <span v-if="row.reimbursement" class="tag">Talangan, tanpa PPh</span>
             <span class="field-hint">{{ row.note || row.hint }}</span>
           </span>
         </label>
@@ -88,16 +89,17 @@ const buildRows = () => {
   const seenInvoices = new Set();
   rows.value = c.addenda.flatMap(a => {
     const out = [];
+    const reimbursement = a.isReimbursement;
     const termins = s.addendumMilestones(c.id, a.id);
     for (const m of termins.filter(m => !s.milestoneHasInvoice(m.id) && m.status !== 'paid')) {
       out.push({
-        key: m.id, addendumTitle: a.title, label: m.title, milestoneId: m.id, amount: m.amount, checked: true,
+        key: m.id, addendumTitle: a.title, label: m.title, milestoneId: m.id, amount: m.amount, checked: true, reimbursement: reimbursement || m.isReimbursement,
         hint: m.isBastRequired && !m.isBastSigned ? 'Termin ber-BAST: pembayaran baru bisa dicatat setelah BAST ditandatangani.' : 'Termin yang sudah dijadwalkan, belum diinvoice.'
       });
     }
     const rest = s.unscheduledValue(c.id, a.id);
     if (rest > 0) {
-      out.push({ key: `${a.id}-rest`, addendumTitle: a.title, label: 'Sisa belum dijadwalkan', addendumId: a.id, amount: rest, max: rest, editable: true, checked: true, hint: `Maksimal ${formatRupiah(rest)}` });
+      out.push({ key: `${a.id}-rest`, addendumTitle: a.title, label: 'Sisa belum dijadwalkan', addendumId: a.id, reimbursement, amount: rest, max: rest, editable: true, checked: true, hint: `Maksimal ${formatRupiah(rest)}` });
     }
     for (const inv of termins.map(m => s.invoiceOfMilestone(m.id)).filter(Boolean)) {
       if (seenInvoices.has(inv.id)) continue;

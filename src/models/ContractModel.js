@@ -14,7 +14,7 @@ export class ContractModel {
     startDate = dateJkt(),
     endDate = '',
     scopeOfWork = [],
-    addenda = [] // tambahan nilai (fitur baru dll): [{ id, title, value, date, description }]
+    addenda = [] // tambahan nilai (fitur baru dll): [{ id, title, value, date, description, isReimbursement }]
   } = {}) {
     this.id = id || `contract_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     this.clientId = clientId;
@@ -26,7 +26,7 @@ export class ContractModel {
     this.endDate = endDate;
     this.scopeOfWork = Array.isArray(scopeOfWork) ? scopeOfWork : [];
     this.addenda = Array.isArray(addenda)
-      ? addenda.map(a => ({ id: a.id || `add_${Date.now()}`, title: a.title || '', value: Number(a.value) || 0, date: a.date || '', description: a.description || '' }))
+      ? addenda.map(a => ({ id: a.id || `add_${Date.now()}`, title: a.title || '', value: Number(a.value) || 0, date: a.date || '', description: a.description || '', isReimbursement: Boolean(a.isReimbursement) }))
       : [];
   }
 
