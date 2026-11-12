@@ -25,3 +25,4 @@ dist-ssr
 
 # Catatan audit internal, tidak perlu ada di repo
 anti-slop/
+.envrc
